@@ -1,0 +1,24 @@
+name: AI Security Scan
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  ai-security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run AI Security Action
+        uses: ./
+        with:
+          config_path: "examples/ai-sec-config.yaml"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload ai-security-output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-security-output
+          path: ai-security-output
+

@@ -1,0 +1,21 @@
+{
+  "name": "ai-security-ci",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "ai-sec": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "openai": "^4.0.0",
+    "yaml": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.0"
+  }
+}
+

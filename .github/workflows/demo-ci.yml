@@ -1,0 +1,31 @@
+name: AI Security CI — DEMO (No API Key)
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    env:
+      DEMO_MODE: "true"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run AI Security (DEMO MODE)
+        run: npx ts-node src/index.ts --config examples/ai-sec-config.yaml
+
+      - name: Upload DEMO output
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-security-demo-output
+          path: ai-security-output
+
