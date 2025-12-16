@@ -188,3 +188,4 @@ This is Phase 1 MVP. Contributions welcome! Please see contributing guidelines (
 ---
 
 **Note:** This tool is designed for defensive security testing of your own AI systems. Only use it on systems you own or have explicit permission to test.
+new run
