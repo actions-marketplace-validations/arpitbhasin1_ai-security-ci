@@ -16,7 +16,16 @@ function timeoutPromise<T>(p: Promise<T>, ms: number): Promise<T> {
 }
 
 export async function callChatCompletion(params: any, timeoutMs = 20000, maxRetries = 2) {
-  // DEMO MODE — return canned responses
+  /**
+   * DEMO_MODE short-circuit: Return canned responses without API calls.
+   * 
+   * This check happens BEFORE accessing the OpenAI client, ensuring:
+   * 1. No API calls are made (zero API cost)
+   * 2. No API key validation is triggered (client is never accessed)
+   * 3. Tool can be tested end-to-end without OpenAI credentials
+   * 
+   * Used for: CI testing, GitHub Marketplace compliance, cost-free validation
+   */
   if (process.env.DEMO_MODE === "true") {
     const promptText = JSON.stringify(params.messages);
     if (promptText.toLowerCase().includes("system prompt")) {
