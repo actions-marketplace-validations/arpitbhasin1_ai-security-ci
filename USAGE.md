@@ -63,20 +63,27 @@ fail_on_high: true  # Default: false
 **Via environment variable:**
 ```bash
 export FAIL_ON_HIGH="true"
-npm run ai-sec -- --config examples/ai-sec-config.yaml
+```
+
+**Note:** `fail_on_high` is bypassed in DEMO_MODE. DEMO_MODE always exits with code 0 (never fails CI), even when high-severity failures are detected.
 ```
 
 ### useJudge
 
-Enable LLM-as-judge evaluation (runs when heuristics are inconclusive):
+Enable LLM-as-judge evaluation. The judge runs ONLY when:
+- Heuristics did NOT detect success (`evaluation.success === false`)
+- AND (attack severity is 'high' OR `useJudge === true`)
+
+**Judge behavior:**
+- Judge can override heuristic result from false → true (if judge detects success that heuristics missed)
+- Judge never overrides a heuristic success (never changes true → false)
+- Judge failures fall back to heuristic result (errors are logged but do not stop execution)
 
 ```yaml
 useJudge: true  # Default: false
 ```
 
-The judge runs only when:
-- Heuristics did NOT detect success
-- AND (attack severity is 'high' OR useJudge is true)
+**Note:** If heuristics already detect success, the judge is never called (no API cost). Judge is only used when heuristics are inconclusive.
 
 ### logLevel
 

@@ -44,10 +44,23 @@ async function runAttacks(attacks, systemPromptPath, model, maxTokens, temperatu
         // Heuristic evaluation
         const evaluation = (0, evaluator_1.evaluateAttack)(attack, content);
         let judgeResult = undefined;
-        // JUDGE MUST RUN ONLY IF:
-        // 1) heuristics did NOT detect success (evaluation.success === false)
-        // AND
-        // 2) (attack.severity === 'high' OR useJudgeFlag === true)
+        /**
+         * Judge execution logic:
+         *
+         * The judge runs ONLY when heuristics are inconclusive (didn't detect success)
+         * AND the attack meets one of these criteria:
+         * - Attack severity is 'high' (always judge high-severity attacks)
+         * - useJudgeFlag is true (user requested judge for all attacks)
+         *
+         * Rationale:
+         * - If heuristics already found indicators, no need for expensive judge call
+         * - High-severity attacks deserve extra scrutiny even if heuristics pass
+         * - Judge can catch subtle failures that keyword-based heuristics miss
+         *
+         * Judge behavior:
+         * - If judge says success but heuristics didn't → override to success
+         * - Judge never overrides a heuristic success (never changes true → false)
+         */
         const heuristicsDetectedSuccess = evaluation.success === true;
         const shouldCallJudge = !heuristicsDetectedSuccess && (attack.severity === "high" || useJudgeFlag === true);
         if (shouldCallJudge) {

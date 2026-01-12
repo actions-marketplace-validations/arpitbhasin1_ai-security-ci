@@ -5844,6 +5844,11 @@ const runAttacks_1 = __nccwpck_require__(2073);
 const reportGenerator_1 = __nccwpck_require__(5628);
 const logger_1 = __nccwpck_require__(6999);
 function getConfigPathFromArgs() {
+    // GitHub Actions inputs are passed as INPUT_* environment variables
+    // Precedence: INPUT_CONFIG_PATH (highest) → --config CLI arg → default path
+    if (process.env.INPUT_CONFIG_PATH && process.env.INPUT_CONFIG_PATH.trim() !== "") {
+        return process.env.INPUT_CONFIG_PATH.trim();
+    }
     const args = process.argv.slice(2);
     const configFlagIndex = args.indexOf("--config");
     if (configFlagIndex !== -1 && args[configFlagIndex + 1]) {
@@ -6121,8 +6126,6 @@ function loadConfig(configPath) {
         useJudge: parsed.useJudge === true || false,
         maxCalls: parsed.maxCalls ? Number(parsed.maxCalls) : undefined,
         fail_on_high: parsed.fail_on_high === true,
-        judgeModel: parsed.judgeModel ? String(parsed.judgeModel) : undefined,
-        demoMode: parsed.demoMode === true || false,
         logLevel: parsed.logLevel || "normal"
     };
     return config;
@@ -6160,11 +6163,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.client = void 0;
 const openai_1 = __importDefault(__nccwpck_require__(2583));
+/**
+ * OpenAI client factory with lazy initialization.
+ *
+ * CRITICAL: Uses Proxy pattern to defer client creation until first property access.
+ * This ensures API key validation only runs when the client is actually used,
+ * not at module import time. This is essential for DEMO_MODE support:
+ * - In DEMO_MODE, openaiWrapper.ts short-circuits before accessing client
+ * - Therefore, getClient() is never called in DEMO_MODE
+ * - Therefore, API key validation never runs in DEMO_MODE
+ *
+ * Without lazy initialization, validation would run at import time, causing
+ * errors even when DEMO_MODE is enabled.
+ */
 let _client = null;
 function getClient() {
     if (_client === null) {
         const isDemoMode = process.env.DEMO_MODE === "true";
         const apiKey = process.env.OPENAI_API_KEY;
+        // Only validate API key if not in DEMO_MODE
+        // In DEMO_MODE, this function should never be called (wrapper short-circuits first)
         if (!isDemoMode && !apiKey) {
             throw new Error("OPENAI_API_KEY not set in environment");
         }
@@ -6206,7 +6224,16 @@ function timeoutPromise(p, ms) {
     });
 }
 async function callChatCompletion(params, timeoutMs = 20000, maxRetries = 2) {
-    // DEMO MODE — return canned responses
+    /**
+     * DEMO_MODE short-circuit: Return canned responses without API calls.
+     *
+     * This check happens BEFORE accessing the OpenAI client, ensuring:
+     * 1. No API calls are made (zero API cost)
+     * 2. No API key validation is triggered (client is never accessed)
+     * 3. Tool can be tested end-to-end without OpenAI credentials
+     *
+     * Used for: CI testing, GitHub Marketplace compliance, cost-free validation
+     */
     if (process.env.DEMO_MODE === "true") {
         const promptText = JSON.stringify(params.messages);
         if (promptText.toLowerCase().includes("system prompt")) {
@@ -6350,10 +6377,23 @@ async function runAttacks(attacks, systemPromptPath, model, maxTokens, temperatu
         // Heuristic evaluation
         const evaluation = (0, evaluator_1.evaluateAttack)(attack, content);
         let judgeResult = undefined;
-        // JUDGE MUST RUN ONLY IF:
-        // 1) heuristics did NOT detect success (evaluation.success === false)
-        // AND
-        // 2) (attack.severity === 'high' OR useJudgeFlag === true)
+        /**
+         * Judge execution logic:
+         *
+         * The judge runs ONLY when heuristics are inconclusive (didn't detect success)
+         * AND the attack meets one of these criteria:
+         * - Attack severity is 'high' (always judge high-severity attacks)
+         * - useJudgeFlag is true (user requested judge for all attacks)
+         *
+         * Rationale:
+         * - If heuristics already found indicators, no need for expensive judge call
+         * - High-severity attacks deserve extra scrutiny even if heuristics pass
+         * - Judge can catch subtle failures that keyword-based heuristics miss
+         *
+         * Judge behavior:
+         * - If judge says success but heuristics didn't → override to success
+         * - Judge never overrides a heuristic success (never changes true → false)
+         */
         const heuristicsDetectedSuccess = evaluation.success === true;
         const shouldCallJudge = !heuristicsDetectedSuccess && (attack.severity === "high" || useJudgeFlag === true);
         if (shouldCallJudge) {

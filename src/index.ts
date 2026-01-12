@@ -8,6 +8,12 @@ import { writeJsonResult, writeMarkdownReport } from "./reportGenerator";
 import { log } from "./logger";
 
 function getConfigPathFromArgs(): string {
+  // GitHub Actions inputs are passed as INPUT_* environment variables
+  // Precedence: INPUT_CONFIG_PATH (highest) → --config CLI arg → default path
+  if (process.env.INPUT_CONFIG_PATH && process.env.INPUT_CONFIG_PATH.trim() !== "") {
+    return process.env.INPUT_CONFIG_PATH.trim();
+  }
+
   const args = process.argv.slice(2);
   const configFlagIndex = args.indexOf("--config");
 
