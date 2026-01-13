@@ -7,8 +7,6 @@ export interface ToolConfig {
   useJudge?: boolean;
   maxCalls?: number;
   fail_on_high?: boolean;
-  judgeModel?: string;
-  demoMode?: boolean;
   logLevel?: "quiet" | "normal" | "verbose";
 }
 

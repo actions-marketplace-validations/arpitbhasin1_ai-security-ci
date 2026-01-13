@@ -4,9 +4,9 @@ Automatically runs defensive prompt-based security checks (jailbreak, prompt lea
 
 ## Key Features
 - CLI + GitHub Action
-- Heuristic + optional LLM-as-judge evaluation (runs when heuristics are inconclusive)
+- Heuristic + LLM-as-judge evaluation (judge runs only when heuristics do not detect success AND attack severity is 'high' OR useJudge is enabled)
 - JSON + Markdown security reports
-- DEMO_MODE (zero-API-cost testing, no API key needed)
+- DEMO_MODE (zero-API-cost testing, no API key needed, always exits with code 0)
 - Sanitized outputs (tokens redacted, content truncated)
 - maxCalls & fail_on_high flags
 - Safe, defensive-only attack library (3 example attacks in Phase-1)

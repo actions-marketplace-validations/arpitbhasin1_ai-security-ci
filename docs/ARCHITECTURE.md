@@ -64,9 +64,11 @@ For each attack (up to `maxCalls` limit):
 
 ### Step 7: Exit Code Logic (`index.ts`)
 
-- **Exit 0**: Normal completion (or DEMO_MODE always exits 0)
+- **Exit 0**: Normal completion OR DEMO_MODE (DEMO_MODE always exits 0, even with high-severity failures)
 - **Exit 1**: Error during execution
 - **Exit 2**: High-severity failure detected AND `fail_on_high === true` AND `DEMO_MODE !== "true"`
+
+**Note:** `fail_on_high` is bypassed in DEMO_MODE. DEMO_MODE always exits with code 0 (never fails CI).
 
 ## Component Responsibilities
 
@@ -160,6 +162,7 @@ The judge runs **ONLY IF**:
 **Judge behavior:**
 - If judge says success but heuristics didn't, overrides `evaluation.success = true`
 - Judge never overrides a heuristic success (never changes `true` → `false`)
+- Judge failures fall back to heuristic result (errors are logged but do not stop execution)
 
 ## Configuration Contract
 
@@ -174,9 +177,9 @@ The judge runs **ONLY IF**:
 - `useJudge`: Enable LLM-as-judge
 - `maxCalls`: Limit number of attacks
 - `fail_on_high`: Exit code 2 on high-severity failures
-- `judgeModel`: Model for judge calls (default: same as main model)
-- `demoMode`: Reserved but not used (use `DEMO_MODE` env var instead)
 - `logLevel`: `"quiet" | "normal" | "verbose"`
+
+**Note:** `DEMO_MODE` is controlled via environment variable only. Setting `demoMode` in config files is not supported.
 
 ### Path Resolution
 All paths are resolved relative to the config file directory.

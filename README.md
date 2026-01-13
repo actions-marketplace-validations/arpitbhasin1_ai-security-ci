@@ -15,7 +15,7 @@ This tool runs simulated prompt attacks against your AI system to detect securit
 - **Prompt leakage** - Checks if your system prompt or internal configuration can be extracted
 - **Harmful content generation** - Validates that your model refuses dangerous requests
 
-The tool evaluates responses using heuristics and optional LLM-based judging (runs when heuristics are inconclusive, based on configuration), then generates detailed reports in JSON and Markdown formats.
+The tool evaluates responses using keyword-based heuristics, then optionally uses LLM-as-judge when heuristics do not detect success (only runs when heuristics fail AND attack severity is 'high' OR useJudge is enabled). Judge can override false → true but never true → false. Judge failures fall back to heuristic results. The tool generates detailed reports in JSON and Markdown formats.
 
 ## 🚀 5-Minute Quick Start
 
@@ -105,7 +105,8 @@ npm run ai-sec -- --config examples/ai-sec-config.yaml
 **DEMO_MODE behavior:**
 - Runs without API calls (zero API cost)
 - No API key required
-- CI will never fail in DEMO_MODE (always exits with code 0)
+- Always exits with code 0 (never fails CI, even with high-severity failures)
+- `fail_on_high` setting is bypassed (ignored in DEMO_MODE)
 
 ### G. Run in GitHub Actions
 
@@ -130,8 +131,9 @@ jobs:
 ```
 
 **Notes:**
-- Reports are uploaded as artifacts (check the Actions tab)
+- Reports are written to `ai-security-output/` directory (JSON and Markdown files)
 - High-severity failures can block PRs if `fail_on_high: true` in your config
+- To upload reports as GitHub Actions artifacts, add an `actions/upload-artifact` step (see example in "GitHub Actions Usage" section)
 
 ---
 
@@ -173,6 +175,8 @@ export DEMO_MODE="true"
 npm run ai-sec -- --config examples/ai-sec-config.yaml
 ```
 
+**Note:** `DEMO_MODE` is controlled via environment variable only. Setting `demoMode` in config files is not supported.
+
 DEMO_MODE uses canned responses, so you can verify the tool works end-to-end without spending API credits. **Note:** When DEMO_MODE is off, you will be charged for OpenAI API usage based on your model and token consumption.
 
 ## ⚙️ Configuration Options
@@ -192,6 +196,24 @@ export MAX_CALLS_PER_RUN=2
 npm run ai-sec -- --config examples/ai-sec-config.yaml
 ```
 
+### useJudge
+
+Enable LLM-as-judge evaluation. The judge runs ONLY when:
+- Heuristics did NOT detect success (`evaluation.success === false`)
+- AND (attack severity is 'high' OR `useJudge === true`)
+
+**Judge behavior:**
+- Judge can override heuristic result from false → true (if judge detects success that heuristics missed)
+- Judge never overrides a heuristic success (never changes true → false)
+- Judge failures fall back to heuristic result (errors are logged but do not stop execution)
+
+**Via config file:**
+```yaml
+useJudge: true  # Default: false
+```
+
+**Note:** If heuristics already detect success, the judge is never called (no API cost). Judge is only used when heuristics are inconclusive.
+
 ### fail_on_high
 
 Control whether the tool exits with code 2 when high-severity failures are detected:
@@ -206,6 +228,8 @@ fail_on_high: true  # Default: false
 export FAIL_ON_HIGH="true"
 npm run ai-sec -- --config examples/ai-sec-config.yaml
 ```
+
+**Note:** `fail_on_high` is bypassed in DEMO_MODE. DEMO_MODE always exits with code 0 (never fails CI), even when high-severity failures are detected.
 
 ## 📝 Configuration File Example
 
@@ -223,7 +247,7 @@ fail_on_high: false
 logLevel: "normal"  # Options: "quiet", "normal", "verbose"
 ```
 
-**Note:** `demoMode` in config is reserved but not used. Use the `DEMO_MODE` environment variable instead.
+**Note:** `DEMO_MODE` is controlled via environment variable only. Setting `demoMode` in config files is not supported.
 
 ### Path Resolution
 
@@ -257,7 +281,9 @@ jobs:
           fail_on_high: "true"
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
 ```
+
 
 ### With maxCalls Limit
 
@@ -311,6 +337,18 @@ This is a **Phase-1 MVP** with deliberate scope limitations:
 - No sensitive data is logged or stored
 - Attack prompts are included in reports for transparency
 - Use `DEMO_MODE` for zero-API-cost testing (no OpenAI API calls)
+
+## 🚧 Early MVP – Feedback Wanted
+
+This is a Phase-1 MVP.
+If you tried this and found it:
+- confusing
+- useful
+- useless
+- missing something critical
+
+Please open an issue or start a discussion.
+Brutally honest feedback is welcome.
 
 ## 📄 License
 
