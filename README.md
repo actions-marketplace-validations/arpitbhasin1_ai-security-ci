@@ -338,17 +338,21 @@ This is a **Phase-1 MVP** with deliberate scope limitations:
 - Attack prompts are included in reports for transparency
 - Use `DEMO_MODE` for zero-API-cost testing (no OpenAI API calls)
 
-## 🚧 Early MVP – Feedback Wanted
+## 🚧 Early MVP — Feedback Wanted
 
-This is a Phase-1 MVP.
-If you tried this and found it:
-- confusing
-- useful
-- useless
-- missing something critical
+This is a Phase-1 MVP focused on validating the core idea.
 
-Please open an issue or start a discussion.
-Brutally honest feedback is welcome.
+If you tried this Action, I’d love feedback on any of the following:
+
+• Was setup intuitive, or did you get stuck anywhere?
+• Did the tests catch something you didn’t expect?
+• Did the results feel actionable, or just noisy?
+• What would make this usable in a real CI pipeline?
+• What’s the *first thing* you’d remove or change?
+
+If you only have 30 seconds, even answering **one** of the above helps a lot.
+
+Please open an Issue or start a Discussion — blunt feedback is very welcome.
 
 ## 📄 License
 
