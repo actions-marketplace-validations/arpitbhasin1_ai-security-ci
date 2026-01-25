@@ -344,11 +344,11 @@ This is a Phase-1 MVP focused on validating the core idea.
 
 If you tried this Action, I’d love feedback on any of the following:
 
-• Was setup intuitive, or did you get stuck anywhere?
-• Did the tests catch something you didn’t expect?
-• Did the results feel actionable, or just noisy?
-• What would make this usable in a real CI pipeline?
-• What’s the *first thing* you’d remove or change?
+. Was setup intuitive, or did you get stuck anywhere? 
+. Did the tests catch something you didn’t expect? 
+. Did the results feel actionable, or just noisy? 
+. What would make this usable in a real CI pipeline? 
+. What’s the *first thing* you’d remove or change?
 
 If you only have 30 seconds, even answering **one** of the above helps a lot.
 
