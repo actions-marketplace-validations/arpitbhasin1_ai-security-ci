@@ -63,9 +63,7 @@ fail_on_high: true  # Default: false
 **Via environment variable:**
 ```bash
 export FAIL_ON_HIGH="true"
-```
-
-**Note:** `fail_on_high` is bypassed in DEMO_MODE. DEMO_MODE always exits with code 0 (never fails CI), even when high-severity failures are detected.
+```**Note:** `fail_on_high` is bypassed in DEMO_MODE. DEMO_MODE always exits with code 0 (never fails CI), even when high-severity failures are detected.
 ```
 
 ### useJudge
@@ -91,9 +89,7 @@ Control logging verbosity:
 
 ```yaml
 logLevel: "normal"  # Options: "quiet", "normal", "verbose"
-```
-
-## Configuration File Example
+```## Configuration File Example
 
 Create `examples/ai-sec-config.yaml`:
 

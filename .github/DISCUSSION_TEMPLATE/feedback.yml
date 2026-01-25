@@ -1,0 +1,53 @@
+title: "💬 First impressions / feedback"
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying AI Security CI! This is a Phase-1 MVP, and your honest feedback helps us improve.
+        
+        All questions below are optional. Share whatever feels relevant.
+  - type: textarea
+    id: how-tried
+    attributes:
+      label: How did you try it?
+      description: CLI, GitHub Action, DEMO_MODE, or something else?
+      placeholder: "e.g., I ran it locally with DEMO_MODE first, then tried it in GitHub Actions..."
+    validations:
+      required: false
+  - type: textarea
+    id: what-worked
+    attributes:
+      label: What worked well?
+      description: What did you like or find useful?
+      placeholder: "e.g., DEMO_MODE was great for testing, the reports were clear..."
+    validations:
+      required: false
+  - type: textarea
+    id: what-confusing
+    attributes:
+      label: What was confusing or unclear?
+      description: Documentation gaps, unclear error messages, or anything that made you pause?
+      placeholder: "e.g., I wasn't sure how to set up the attack library, the config path resolution was unclear..."
+    validations:
+      required: false
+  - type: textarea
+    id: what-missing
+    attributes:
+      label: What's missing or blocking real usage?
+      description: Features, documentation, or anything that prevents you from using this in production?
+      placeholder: "e.g., I need multi-turn attacks, I wish there was a dashboard..."
+    validations:
+      required: false
+  - type: textarea
+    id: what-stops-usage
+    attributes:
+      label: What would stop you from using it again?
+      description: Deal-breakers, friction points, or concerns?
+      placeholder: "e.g., Too expensive, too slow, missing critical features..."
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: |
+        **Blunt feedback is welcome.** This is an early MVP, and we want to hear the good, the bad, and the ugly.
