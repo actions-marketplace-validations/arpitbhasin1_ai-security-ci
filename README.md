@@ -1,4 +1,4 @@
-# AI Security CI (Phase 1 MVP)
+# Catch prompt injection vulnerabilities before deploy. (Phase 1 MVP)
 
 Automated AI prompt security testing that runs in your CI pipeline. Think: unit tests / SAST — but for AI prompts and agents.
 
